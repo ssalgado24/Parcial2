@@ -5,17 +5,60 @@
  */
 package Frontera;
 
+import Entidad.*;
+import DAO.*;
+import Validar.*;
+import static java.lang.Math.random;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.Time;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import javax.persistence.Query;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author Samuel
  */
 public class Principal extends javax.swing.JFrame {
-
+   TablaHD h=new TablaHD();
+   TablaSensor ts= new TablaSensor();
+   TablaTS s= new TablaTS();
+   Random num= new Random();
+   Date date=new Date();
+   validarTS temp=new validarTS();
+   HistoricoDatosDAO daoHD= new HistoricoDatosDAO();
+   SensorDAO daoS= new SensorDAO();
+   TipoSensorDAO daoTS= new TipoSensorDAO();
+   ArrayList<HistoricoDatos> listaH= new ArrayList<>();
     /**
      * Creates new form Principal
      */
+   
     public Principal() {
         initComponents();
+        inicializacion();
+    }
+    public void inicializacion(){
+        ts.setTipo("HUMEDAD");
+        ts.setNombre("Sensor de humedad");
+        ts.setMinimo(0);
+        ts.setMaximo(950);
+        
+        s.setTipo(ts.getTipo());
+        s.setUbicacion("Central");
+        s.setIdsensor(1);
+        
+        System.out.println("Sensor");
+        System.out.println(s.getIdsensor() + " " + s.getUbicacion() + " " + s.getTipo());
+        System.out.println("\n Tipo de Sensor");
+        System.out.println(ts.getTipo()+ " " + ts.getNombre() + " (" + ts.getMinimo() + " - " + ts.getMaximo()+")");
+        
     }
 
     /**
