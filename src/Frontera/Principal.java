@@ -27,15 +27,15 @@ import javax.swing.table.DefaultTableModel;
  */
 public class Principal extends javax.swing.JFrame {
    TablaHD h=new TablaHD();
-   TablaSensor ts= new TablaSensor();
-   TablaTS s= new TablaTS();
+   TablaSensor s= new TablaSensor();
+   TablaTS ts= new TablaTS();
    Random num= new Random();
    Date date=new Date();
    validarTS temp=new validarTS();
-   HistoricoDatosDAO daoHD= new HistoricoDatosDAO();
+   TablaHDDAO daoHD= new HistoricoDatosDAO();
    SensorDAO daoS= new SensorDAO();
    TipoSensorDAO daoTS= new TipoSensorDAO();
-   ArrayList<HistoricoDatos> listaH= new ArrayList<>();
+   ArrayList<TablaHD> listaH= new ArrayList<>();
     /**
      * Creates new form Principal
      */

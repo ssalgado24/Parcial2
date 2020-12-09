@@ -10,8 +10,8 @@ import javax.persistence.*;
  *
  * @author Samuel
  */
- @Entity
- @Table(name="TipoSensor")
+@Entity
+@Table(name="TipoSensor")
 public class TablaTS implements Serializable{
     @Id
     public String tipo;
