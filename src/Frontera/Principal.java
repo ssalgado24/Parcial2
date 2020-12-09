@@ -5,9 +5,9 @@
  */
 package Frontera;
 
+import Control.Validacion;
 import Entidad.*;
 import DAO.*;
-import Validar.*;
 import static java.lang.Math.random;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -31,10 +31,10 @@ public class Principal extends javax.swing.JFrame {
    TablaTS ts= new TablaTS();
    Random num= new Random();
    Date date=new Date();
-   validarTS temp=new validarTS();
-   TablaHDDAO daoHD= new HistoricoDatosDAO();
-   SensorDAO daoS= new SensorDAO();
-   TipoSensorDAO daoTS= new TipoSensorDAO();
+   Validacion temp=new Validacion();
+   TablaHDDAO daoHD= new TablaHDDAO();
+   TablaSensorDAO daoS= new TablaSensorDAO();
+   TablaTSDAO daoTS= new TablaTSDAO();
    ArrayList<TablaHD> listaH= new ArrayList<>();
     /**
      * Creates new form Principal
@@ -51,14 +51,54 @@ public class Principal extends javax.swing.JFrame {
         ts.setMaximo(950);
         
         s.setTipo(ts.getTipo());
-        s.setUbicacion("Central");
-        s.setIdsensor(1);
+        s.setUbicacion("Sector I");
+        s.setIdsensor(50);
         
         System.out.println("Sensor");
         System.out.println(s.getIdsensor() + " " + s.getUbicacion() + " " + s.getTipo());
         System.out.println("\n Tipo de Sensor");
         System.out.println(ts.getTipo()+ " " + ts.getNombre() + " (" + ts.getMinimo() + " - " + ts.getMaximo()+")");
         
+    }
+     public ArrayList<TablaHD> lista (){     
+        listaH.clear();
+        try {
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            String url="jdbc:derby://localhost:1527/BaseParcial";
+            String login="admin_APP";
+            String password="samuel";
+            Connection con= DriverManager.getConnection(url,login , password);
+            String query="SELECT * FROM ADMIN_APP.HISTORICO ORDER BY id DESC";
+            Statement st=con.createStatement();
+            ResultSet rs= st.executeQuery(query);
+            TablaHD hd;
+            while (rs.next()){
+                hd= new TablaHD(rs.getInt("IDSENSOR"),rs.getDouble("VALUE"),rs.getString("DATE"), rs.getInt("ID"));
+                listaH.add(hd); 
+            }                
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+        return listaH;
+        
+    }  
+    public void llenar(){
+        DefaultTableModel model= (DefaultTableModel) jTable1.getModel();   
+        Object[] row= new Object[4];  
+        
+        int rowCount = model.getRowCount();
+            for(int i = 0; i < rowCount; i++){
+                model.removeRow(0);
+            } 
+        
+        for(int i=0;i<5;i++){
+            row[0]=listaH.get(i).getId();
+            row[1]=listaH.get(i).getIdsensor();
+            row[2]=listaH.get(i).getValue();
+            row[3]=listaH.get(i).getDate();
+            model.addRow(row);           
+        }
     }
 
     /**
@@ -74,7 +114,10 @@ public class Principal extends javax.swing.JFrame {
         jToolBar1 = new javax.swing.JToolBar();
         enviarDatoB = new javax.swing.JButton();
         mostrarDatosB = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
         panelPrincipal = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -84,13 +127,29 @@ public class Principal extends javax.swing.JFrame {
         enviarDatoB.setFocusable(false);
         enviarDatoB.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         enviarDatoB.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        enviarDatoB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                enviarDatoBActionPerformed(evt);
+            }
+        });
         jToolBar1.add(enviarDatoB);
 
         mostrarDatosB.setText("Mostrar Datos");
         mostrarDatosB.setFocusable(false);
         mostrarDatosB.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         mostrarDatosB.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        mostrarDatosB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mostrarDatosBActionPerformed(evt);
+            }
+        });
         jToolBar1.add(mostrarDatosB);
+
+        jButton1.setText("Parcial");
+        jButton1.setFocusable(false);
+        jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(jButton1);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -99,7 +158,7 @@ public class Principal extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 363, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(27, Short.MAX_VALUE))
+                .addContainerGap(32, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -109,15 +168,42 @@ public class Principal extends javax.swing.JFrame {
                 .addContainerGap(64, Short.MAX_VALUE))
         );
 
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "ID", "ID Sensor", "Valor_Humedad", "Fecha"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(jTable1);
+
         javax.swing.GroupLayout panelPrincipalLayout = new javax.swing.GroupLayout(panelPrincipal);
         panelPrincipal.setLayout(panelPrincipalLayout);
         panelPrincipalLayout.setHorizontalGroup(
             panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelPrincipalLayout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         panelPrincipalLayout.setVerticalGroup(
             panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 183, Short.MAX_VALUE)
+            .addGroup(panelPrincipalLayout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -141,6 +227,25 @@ public class Principal extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void mostrarDatosBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mostrarDatosBActionPerformed
+        // TODO add your handling code here:
+        jTable1.setVisible(true);
+        lista();
+        llenar();
+    }//GEN-LAST:event_mostrarDatosBActionPerformed
+
+    private void enviarDatoBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enviarDatoBActionPerformed
+        // TODO add your handling code here:
+        h.setIdsensor(s.getIdsensor());
+        h.setValue(Math.random()*950);
+        h.setDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(date));
+        if(temp.verificar(h.getValue())==true){
+            System.out.println(h.getId()+ " " +h.getIdsensor()+ " " +h.getValue()+ " " +h.getDate());
+            daoHD.crear(h);                    
+        }  
+        jTable1.setVisible(false);
+    }//GEN-LAST:event_enviarDatoBActionPerformed
 
     /**
      * @param args the command line arguments
@@ -179,7 +284,10 @@ public class Principal extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton enviarDatoB;
+    private javax.swing.JButton jButton1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable jTable1;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JButton mostrarDatosB;
     private javax.swing.JPanel panelPrincipal;

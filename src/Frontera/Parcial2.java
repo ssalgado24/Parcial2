@@ -16,6 +16,8 @@ public class Parcial2 {
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        Principal fp= new Principal();
+        fp.setVisible(true);
     }
     
 }

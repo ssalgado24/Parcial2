@@ -4,8 +4,9 @@
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <class>Entidad.TablaHD</class>
     <class>Entidad.TablaSensor</class>
+    <class>Entidad.TablaTS</class>
     <properties>
-      <property name="javax.persistence.jdbc.url" value="jdbc:derby://localhost:1527/Parcial"/>
+      <property name="javax.persistence.jdbc.url" value="jdbc:derby://localhost:1527/BaseParcial"/>
       <property name="javax.persistence.jdbc.user" value="admin_APP"/>
       <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.ClientDriver"/>
       <property name="javax.persistence.jdbc.password" value="samuel"/>
