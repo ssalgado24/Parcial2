@@ -26,12 +26,11 @@ import javax.swing.table.DefaultTableModel;
  * @author Samuel
  */
 public class Principal extends javax.swing.JFrame {
-   TablaHD h=new TablaHD();
-   TablaSensor s= new TablaSensor();
-   TablaTS ts= new TablaTS();
-   Random num= new Random();
+   TablaHD historico=new TablaHD();
+   TablaSensor sens= new TablaSensor();
+   TablaTS tablasens= new TablaTS();
    Date date=new Date();
-   Validacion temp=new Validacion();
+   Validacion val=new Validacion();
    TablaHDDAO daoHD= new TablaHDDAO();
    TablaSensorDAO daoS= new TablaSensorDAO();
    TablaTSDAO daoTS= new TablaTSDAO();
@@ -45,22 +44,26 @@ public class Principal extends javax.swing.JFrame {
         inicializacion();
     }
     public void inicializacion(){
-        ts.setTipo("HUMEDAD");
-        ts.setNombre("Sensor de humedad");
-        ts.setMinimo(0);
-        ts.setMaximo(950);
+        tablasens.setTipo("HUMEDAD");
+        tablasens.setNombre("Sensor de humedad");
+        tablasens.setMinimo(100);
+        tablasens.setMaximo(850);
+        tablasens.setPromedio("No");
+        tablasens.setNumeroHoras(2);
         
-        s.setTipo(ts.getTipo());
-        s.setUbicacion("Sector I");
-        s.setIdsensor(50);
+        
+        sens.setTipo(tablasens.getTipo());
+        sens.setUbicacion("Sector I");
+        sens.setIdsensor(50);
         
         System.out.println("Sensor");
-        System.out.println(s.getIdsensor() + " " + s.getUbicacion() + " " + s.getTipo());
+        System.out.println(sens.getIdsensor() + " " + sens.getUbicacion() + " " + sens.getTipo());
         System.out.println("\n Tipo de Sensor");
-        System.out.println(ts.getTipo()+ " " + ts.getNombre() + " (" + ts.getMinimo() + " - " + ts.getMaximo()+")");
+        System.out.println(tablasens.getTipo()+ " " + tablasens.getNombre() + " (" + tablasens.getMinimo() + " - " + tablasens.getMaximo()+")");
         
     }
-     public ArrayList<TablaHD> lista (){     
+    
+    public ArrayList<TablaHD> crearLista (){     
         listaH.clear();
         try {
             Class.forName("org.apache.derby.jdbc.ClientDriver");
@@ -83,7 +86,8 @@ public class Principal extends javax.swing.JFrame {
         return listaH;
         
     }  
-    public void llenar(){
+  
+    public void showDatos(){
         DefaultTableModel model= (DefaultTableModel) jTable1.getModel();   
         Object[] row= new Object[4];  
         
@@ -100,6 +104,68 @@ public class Principal extends javax.swing.JFrame {
             model.addRow(row);           
         }
     }
+    public void showDatos2(){
+        DefaultTableModel model= (DefaultTableModel) jTable3.getModel();   
+        Object[] row= new Object[4];  
+        
+        int rowCount = model.getRowCount();
+            for(int i = 0; i < rowCount; i++){
+                model.removeRow(0);
+            } 
+        
+        for(int i=0;i<1;i++){
+            row[0]=listaH.get(i).getId();
+            row[1]=listaH.get(i).getIdsensor();
+            row[2]=listaH.get(i).getValue();
+            row[3]=listaH.get(i).getDate();
+            model.addRow(row);           
+        }
+        String valorNo=row[2].toString();
+        double valNo= Double.parseDouble(valorNo);
+        if(valNo<150){
+            System.out.println("Inferior al límite permitido");
+        }else if(valNo>850){
+            System.out.println("Superior al máximo permitido");
+        }else{
+            System.out.println("Sí está entre el mínimo y el máximo");
+        }    
+        
+        
+    }
+    
+    public ArrayList<TablaHD> crearListaParcial (){     
+        listaH.clear();
+        try {
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            String url="jdbc:derby://localhost:1527/BaseParcial";
+            String login="admin_APP";
+            String password="samuel";
+            Connection con= DriverManager.getConnection(url,login , password);
+            String query="SELECT * FROM ADMIN_APP.HISTORICO ORDER BY id DESC";
+            Statement st=con.createStatement();
+            ResultSet rs= st.executeQuery(query);
+            TablaHD hd;
+            while (rs.next()){
+                hd= new TablaHD(rs.getInt("IDSENSOR"),rs.getDouble("VALUE"),rs.getString("DATE"), rs.getInt("ID"));
+                listaH.add(hd); 
+            }                
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+        return listaH;
+        
+    }
+    public void validarPromedio(TablaTS tablasens){
+        String prom=tablasens.getPromedio();
+        System.out.println(prom);
+        if(prom.equals("No")){
+            crearLista();
+            showDatos2();
+        }else if(prom.equals("Si")){
+            
+        }
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -110,14 +176,32 @@ public class Principal extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTable2 = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
         jToolBar1 = new javax.swing.JToolBar();
         enviarDatoB = new javax.swing.JButton();
         mostrarDatosB = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
-        panelPrincipal = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
+        panelPrincipal = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jTable3 = new javax.swing.JTable();
+
+        jTable2.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane2.setViewportView(jTable2);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -145,28 +229,16 @@ public class Principal extends javax.swing.JFrame {
         });
         jToolBar1.add(mostrarDatosB);
 
-        jButton1.setText("Parcial");
+        jButton1.setText("Procesamiento de datos");
         jButton1.setFocusable(false);
         jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
         jToolBar1.add(jButton1);
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 363, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(32, Short.MAX_VALUE))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(64, Short.MAX_VALUE))
-        );
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -191,18 +263,75 @@ public class Principal extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(jTable1);
 
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 363, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+
+        jTable3.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null}
+            },
+            new String [] {
+                "ID", "ID Sensor", "Valor Humedad", "Fecha"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane3.setViewportView(jTable3);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 367, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+
         javax.swing.GroupLayout panelPrincipalLayout = new javax.swing.GroupLayout(panelPrincipal);
         panelPrincipal.setLayout(panelPrincipalLayout);
         panelPrincipalLayout.setHorizontalGroup(
             panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelPrincipalLayout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         panelPrincipalLayout.setVerticalGroup(
             panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelPrincipalLayout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
@@ -231,21 +360,27 @@ public class Principal extends javax.swing.JFrame {
     private void mostrarDatosBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mostrarDatosBActionPerformed
         // TODO add your handling code here:
         jTable1.setVisible(true);
-        lista();
-        llenar();
+        crearLista();
+        showDatos();
     }//GEN-LAST:event_mostrarDatosBActionPerformed
 
     private void enviarDatoBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enviarDatoBActionPerformed
         // TODO add your handling code here:
-        h.setIdsensor(s.getIdsensor());
-        h.setValue(Math.random()*950);
-        h.setDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(date));
-        if(temp.verificar(h.getValue())==true){
-            System.out.println(h.getId()+ " " +h.getIdsensor()+ " " +h.getValue()+ " " +h.getDate());
-            daoHD.crear(h);                    
+        historico.setIdsensor(sens.getIdsensor());
+        historico.setValue(Math.random()*950);
+        historico.setDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(date));
+        if(val.verificar(historico.getValue())==true){
+            System.out.println(historico.getId()+ " " +historico.getIdsensor()+ " " +historico.getValue()+ " " +historico.getDate());
+            daoHD.crear(historico);                    
         }  
         jTable1.setVisible(false);
     }//GEN-LAST:event_enviarDatoBActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        jTable3.setVisible(true);
+        validarPromedio(tablasens);
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -286,8 +421,13 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JButton enviarDatoB;
     private javax.swing.JButton jButton1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTable jTable1;
+    private javax.swing.JTable jTable2;
+    private javax.swing.JTable jTable3;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JButton mostrarDatosB;
     private javax.swing.JPanel panelPrincipal;

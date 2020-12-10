@@ -18,6 +18,19 @@ public class TablaTS implements Serializable{
     public String nombre;
     public double minimo;
     public double maximo;
+    public String promedio;
+    public double numeroHoras;
+
+    public TablaTS(String tipo, String nombre, double minimo, double maximo, String promedio, double numeroHoras) {
+        this.tipo = tipo;
+        this.nombre = nombre;
+        this.minimo = minimo;
+        this.maximo = maximo;
+        this.promedio = promedio;
+        this.numeroHoras = numeroHoras;
+    }
+    
+    
 
     public TablaTS() {
     }
@@ -52,6 +65,23 @@ public class TablaTS implements Serializable{
 
     public void setMaximo(double maximo) {
         this.maximo = maximo;
+        
+    }
+
+    public String getPromedio() {
+        return promedio;
+    }
+
+    public void setPromedio(String promedio) {
+        this.promedio = promedio;
+    }
+
+    public double getNumeroHoras() {
+        return numeroHoras;
+    }
+
+    public void setNumeroHoras(double numeroHoras) {
+        this.numeroHoras = numeroHoras;
     }
     
     
