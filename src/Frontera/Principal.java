@@ -35,6 +35,7 @@ public class Principal extends javax.swing.JFrame {
    TablaSensorDAO daoS= new TablaSensorDAO();
    TablaTSDAO daoTS= new TablaTSDAO();
    ArrayList<TablaHD> listaH= new ArrayList<>();
+   double avg;
     /**
      * Creates new form Principal
      */
@@ -48,7 +49,7 @@ public class Principal extends javax.swing.JFrame {
         tablasens.setNombre("Sensor de humedad");
         tablasens.setMinimo(100);
         tablasens.setMaximo(850);
-        tablasens.setPromedio("No");
+        tablasens.setPromedio("Si");
         tablasens.setNumeroHoras(2);
         
         
@@ -123,17 +124,17 @@ public class Principal extends javax.swing.JFrame {
         String valorNo=row[2].toString();
         double valNo= Double.parseDouble(valorNo);
         if(valNo<150){
-            System.out.println("Inferior al límite permitido");
+            JOptionPane.showMessageDialog(null, "Inferior al mínimo permitido \n Promedio: "+valNo);
         }else if(valNo>850){
-            System.out.println("Superior al máximo permitido");
+            JOptionPane.showMessageDialog(null, "Superior al máximo permitido \n Promedio: "+valNo);
         }else{
-            System.out.println("Sí está entre el mínimo y el máximo");
+            JOptionPane.showMessageDialog(null, "Está entre el mínimo y el máximo permitido\n Promedio: "+valNo);
         }    
         
         
     }
     
-    public ArrayList<TablaHD> crearListaParcial (){     
+    public Double crearListaParcial (){     
         listaH.clear();
         try {
             Class.forName("org.apache.derby.jdbc.ClientDriver");
@@ -141,19 +142,25 @@ public class Principal extends javax.swing.JFrame {
             String login="admin_APP";
             String password="samuel";
             Connection con= DriverManager.getConnection(url,login , password);
-            String query="SELECT * FROM ADMIN_APP.HISTORICO ORDER BY id DESC";
+            String query="SELECT AVG(VALUE) AS VALOR_PROMEDIO FROM ADMIN_APP.HISTORICO WHERE DATE BETWEEN '2020-12-09 04:20:00.611' AND CURRENT_TIMESTAMP";
             Statement st=con.createStatement();
             ResultSet rs= st.executeQuery(query);
             TablaHD hd;
             while (rs.next()){
-                hd= new TablaHD(rs.getInt("IDSENSOR"),rs.getDouble("VALUE"),rs.getString("DATE"), rs.getInt("ID"));
-                listaH.add(hd); 
+                avg=rs.getDouble("VALOR_PROMEDIO"); 
             }                
             
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);
         }
-        return listaH;
+        if(avg<150){
+            JOptionPane.showMessageDialog(null, "Inferior al mínimo permitido \n Promedio: "+avg);
+        }else if(avg>850){
+            JOptionPane.showMessageDialog(null, "Superior al máximo permitido \n Promedio: "+avg);
+        }else{
+            JOptionPane.showMessageDialog(null, "Está entre el mínimo y el máximo permitido\n Promedio: "+avg);
+        }  
+        return avg;
         
     }
     public void validarPromedio(TablaTS tablasens){
@@ -163,7 +170,7 @@ public class Principal extends javax.swing.JFrame {
             crearLista();
             showDatos2();
         }else if(prom.equals("Si")){
-            
+            crearListaParcial();
         }
     }
 
