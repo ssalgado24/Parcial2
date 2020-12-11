@@ -36,6 +36,7 @@ public class Principal extends javax.swing.JFrame {
    TablaTSDAO daoTS= new TablaTSDAO();
    ArrayList<TablaHD> listaH= new ArrayList<>();
    double avg;
+   String valorPromedio;
     /**
      * Creates new form Principal
      */
@@ -123,9 +124,9 @@ public class Principal extends javax.swing.JFrame {
         }
         String valorNo=row[2].toString();
         double valNo= Double.parseDouble(valorNo);
-        if(valNo<150){
+        if(valNo<30){
             JOptionPane.showMessageDialog(null, "Inferior al mínimo permitido \n Promedio: "+valNo);
-        }else if(valNo>850){
+        }else if(valNo>70){
             JOptionPane.showMessageDialog(null, "Superior al máximo permitido \n Promedio: "+valNo);
         }else{
             JOptionPane.showMessageDialog(null, "Está entre el mínimo y el máximo permitido\n Promedio: "+valNo);
@@ -142,7 +143,7 @@ public class Principal extends javax.swing.JFrame {
             String login="admin_APP";
             String password="samuel";
             Connection con= DriverManager.getConnection(url,login , password);
-            String query="SELECT AVG(VALUE) AS VALOR_PROMEDIO FROM ADMIN_APP.HISTORICO WHERE DATE BETWEEN '2020-12-09 04:20:00.611' AND CURRENT_TIMESTAMP";
+            String query="SELECT AVG(VALUE) AS VALOR_PROMEDIO FROM ADMIN_APP.HISTORICO WHERE DATE BETWEEN '2020-12-11 12:00:00.603' AND CURRENT_TIMESTAMP";
             Statement st=con.createStatement();
             ResultSet rs= st.executeQuery(query);
             TablaHD hd;
@@ -153,9 +154,9 @@ public class Principal extends javax.swing.JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);
         }
-        if(avg<150){
+        if(avg<30){
             JOptionPane.showMessageDialog(null, "Inferior al mínimo permitido \n Promedio: "+avg);
-        }else if(avg>850){
+        }else if(avg>70){
             JOptionPane.showMessageDialog(null, "Superior al máximo permitido \n Promedio: "+avg);
         }else{
             JOptionPane.showMessageDialog(null, "Está entre el mínimo y el máximo permitido\n Promedio: "+avg);
@@ -163,9 +164,31 @@ public class Principal extends javax.swing.JFrame {
         return avg;
         
     }
+  /*  public String obtenerPromedio (){     
+
+        try {
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            String url="jdbc:derby://localhost:1527/BaseParcial";
+            String login="admin_APP";
+            String password="samuel";
+            Connection con= DriverManager.getConnection(url,login , password);
+            String query="SELECT PROMEDIO FROM ADMIN_APP.TIPOSENSOR;";
+            Statement st=con.createStatement();
+            ResultSet rs= st.executeQuery(query);
+            TablaHD hd;
+            valorPromedio=rs.getString("PROMEDIO"); 
+            /*while (rs.next()){
+                valorPromedio=rs.get"PROMEDIO"); 
+            }            
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+        return valorPromedio;
+        
+    }*/
     public void validarPromedio(TablaTS tablasens){
         String prom=tablasens.getPromedio();
-        System.out.println(prom);
         if(prom.equals("No")){
             crearLista();
             showDatos2();
@@ -374,7 +397,7 @@ public class Principal extends javax.swing.JFrame {
     private void enviarDatoBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enviarDatoBActionPerformed
         // TODO add your handling code here:
         historico.setIdsensor(sens.getIdsensor());
-        historico.setValue(Math.random()*950);
+        historico.setValue(Math.random()*100);
         historico.setDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(date));
         if(val.verificar(historico.getValue())==true){
             System.out.println(historico.getId()+ " " +historico.getIdsensor()+ " " +historico.getValue()+ " " +historico.getDate());

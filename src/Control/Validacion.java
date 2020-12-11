@@ -17,6 +17,6 @@ public class Validacion {
     public void verificarTS (TablaTS ts){
     }
     public boolean verificar (double x){
-        return (x>=0 && x<=950);
+        return (x>=0 && x<=100);
     }
 }
